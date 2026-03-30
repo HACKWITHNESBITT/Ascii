@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>QR ASCII Generator</title>
+    <title>QR TEXTIFY</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 
@@ -10,35 +10,52 @@
 
     <div class="container">
 
-        <h1>QR ASCII Generator</h1>
+        <pre class="title">
+
+ ██████╗██╗  ██╗███████╗███╗   ███╗███████╗
+██╔════╝██║  ██║██╔════╝████╗ ████║██╔════╝
+██║     ███████║█████╗  ██╔████╔██║███████╗
+██║     ██╔══██║██╔══╝  ██║╚██╔╝██║╚════██║
+╚██████╗██║  ██║███████╗██║ ╚═╝ ██║███████║
+ ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝╚══════╝
+        
+        </pre>
 
         <button id="darkToggle">🌙 Toggle Dark Mode</button>
 
-        <form action="/generate" method="POST">
+<div class="input-section">
+    <input type="text" name="text" id="textInput" placeholder="Enter text or URL..." required>
+</div>
+<form id="qrForm" action="/generate-qr" method="POST">
+    <button type="submit">Generate QR</button>
+</form>
+<form id="logoForm" action="/generate-logo" method="POST">
+    <input type="hidden" name="text" id="logoText">
+    <button type="submit">Generate Logo</button>
+</form>
 
-            <input type="text" name="text" id="textInput" placeholder="Enter text or URL..." required>
+<div class="actions">
 
-            <button type="submit">Generate QR</button>
+            <button onclick="copyASCII()">Copy QR</button>
 
-        </form>
+            <button onclick="copyLogo()">Copy Logo</button>
 
-        <div class="actions">
+            <a id="downloadPNG" href="/download/png?text={{.Text}}">Download PNG</a>
 
-            <button onclick="copyASCII()">Copy ASCII</button>
-
-            <a id="downloadPNG">Download PNG</a>
-
-            <a href="/download/ascii">Download ASCII</a>
+            <a id="downloadASCII" href="/download/ascii?text={{.Text}}">Download ASCII</a>
 
         </div>
 
         <div class="loader" id="loader"></div>
 
-        <pre id="ascii">{{.ASCII}}</pre>
+        <div class="outputs">
+        <pre id="logo" class="output">{{.Logo}}</pre>
+        <pre id="ascii" class="output">{{.ASCIIQR}}</pre>
+        </div>
 
     </div>
 
-    <script src="/static/script.js"></script>
+    <script src="/static/static/script.js"></script>
 
 </body>
 
