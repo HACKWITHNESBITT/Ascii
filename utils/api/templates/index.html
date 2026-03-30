@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>QR ASCII Generator</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>QR ASCII Generator</h1>
+
+        <button id="darkToggle">🌙 Toggle Dark Mode</button>
+
+        <form action="/generate" method="POST">
+
+            <input type="text" name="text" id="textInput" placeholder="Enter text or URL..." required>
+
+            <button type="submit">Generate QR</button>
+
+        </form>
+
+        <div class="actions">
+
+            <button onclick="copyASCII()">Copy ASCII</button>
+
+            <a id="downloadPNG">Download PNG</a>
+
+            <a href="/download/ascii">Download ASCII</a>
+
+        </div>
+
+        <div class="loader" id="loader"></div>
+
+        <pre id="ascii">{{.ASCII}}</pre>
+
+    </div>
+
+    <script src="/static/script.js"></script>
+
+</body>
+
+</html>
