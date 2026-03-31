@@ -1,16 +1,33 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>QR TEXTIFY</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="QR TEXTIFY - Generate QR codes and ASCII art logos">
+    <meta name="keywords" content="QR code, ASCII art, logo generator, text to QR">
+    <meta name="author" content="QR TEXTIFY">
+    
+    <title>QR TEXTIFY - ASCII Art Generator</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎨</text></svg>">
+    
+    <!-- Stylesheet -->
     <link rel="stylesheet" href="/static/style.css">
+    
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
 </head>
 
 <body>
+    <!-- Dark Mode Toggle -->
+    <button id="darkToggle" aria-label="Toggle dark mode">Dark Mode</button>
 
     <div class="container">
-
-        <pre class="title">
+        <!-- Header Section -->
+        <header>
+            <pre class="title" aria-label="QR TEXTIFY Logo">
 
  ██████╗██╗  ██╗███████╗███╗   ███╗███████╗
 ██╔════╝██║  ██║██╔════╝████╗ ████║██╔════╝
@@ -19,44 +36,171 @@
 ╚██████╗██║  ██║███████╗██║ ╚═╝ ██║███████║
  ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝╚══════╝
         
-        </pre>
+            </pre>
+            <p class="subtitle">Transform your text, URL's into beautiful QR codes and ASCII art logos</p>
+        </header>
 
-        <button id="darkToggle">🌙 Toggle Dark Mode</button>
+        <!-- Input Section -->
+        <section class="input-section" aria-label="Text input">
+            <label for="textInput" class="visually-hidden">Enter text or URL</label>
+            <input 
+                type="text" 
+                name="text" 
+                id="textInput" 
+                placeholder="Enter text or URL..." 
+                required
+                aria-required="true"
+                autocomplete="off"
+                spellcheck="false"
+            >
+        </section>
 
-<div class="input-section">
-    <input type="text" name="text" id="textInput" placeholder="Enter text or URL..." required>
-</div>
-<form id="qrForm" action="/generate-qr" method="POST">
-    <button type="submit">Generate QR</button>
-</form>
-<form id="logoForm" action="/generate-logo" method="POST">
-    <input type="hidden" name="text" id="logoText">
-    <button type="submit">Generate Logo</button>
-</form>
+        <!-- Forms Section -->
+        <section class="forms-section" aria-label="Generation forms">
+            <form id="qrForm" action="/generate-qr" method="POST" aria-label="Generate QR code form">
+                <input type="hidden" name="text" id="qrText">
+                <button type="submit" data-tooltip="Generate QR code from text (Ctrl+Enter)">
+                    <span class="button-icon">📱</span>
+                    Generate QR
+                </button>
+            </form>
+            
+            <form id="logoForm" action="/generate-logo" method="POST" aria-label="Generate logo form">
+                <input type="hidden" name="text" id="logoText">
+                <button type="submit" data-tooltip="Generate ASCII art logo (Ctrl+Shift+Enter)">
+                    <span class="button-icon">🎨</span>
+                    Generate Logo
+                </button>
+            </form>
+        </section>
 
-<div class="actions">
+        <!-- Actions Section -->
+        <section class="actions" aria-label="Actions">
+            <button onclick="copyASCII()" data-tooltip="Download QR code as text file">
+                <span class="button-icon">💾</span>
+                Download QR
+            </button>
 
-            <button onclick="copyASCII()">Copy QR</button>
+            <button onclick="copyLogo()" data-tooltip="Download logo as text file">
+                <span class="button-icon">📄</span>
+                Download Logo
+            </button>
 
-            <button onclick="copyLogo()">Copy Logo</button>
+            <a id="downloadASCII" href="/download/ascii?text={{.Text}}" data-tooltip="Download QR as text file">
+                <span class="button-icon">💾</span>
+                Download ASCII
+            </a>
+        </section>
 
-            <a id="downloadPNG" href="/download/png?text={{.Text}}">Download PNG</a>
-
-            <a id="downloadASCII" href="/download/ascii?text={{.Text}}">Download ASCII</a>
-
+        <!-- Loader -->
+        <div class="loader" id="loader" role="status" aria-label="Loading">
+            <span class="visually-hidden">Generating...</span>
         </div>
 
-        <div class="loader" id="loader"></div>
+        <!-- Outputs Section -->
+        <section class="outputs" aria-label="Generated outputs">
+            <article class="output-container">
+                <h2 class="output-title">ASCII Art Logo</h2>
+                <pre id="logo" class="output" aria-label="Generated logo">{{.Logo}}</pre>
+            </article>
+            
+            <article class="output-container">
+                <h2 class="output-title">QR Code</h2>
+                <pre id="ascii" class="output" aria-label="Generated QR code">{{.ASCIIQR}}</pre>
+            </article>
+        </section>
 
-        <div class="outputs">
-        <pre id="logo" class="output">{{.Logo}}</pre>
-        <pre id="ascii" class="output">{{.ASCIIQR}}</pre>
-        </div>
-
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Press <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to generate QR</p>
+            <p>Press <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Enter</kbd> to generate Logo</p>
+            <p>Press <kbd>Escape</kbd> to clear input</p>
+        </footer>
     </div>
 
-    <script src="/static/static/script.js"></script>
+    <!-- JavaScript -->
+    <script src="/static/script.js"></script>
+    
+    <!-- Accessibility: Skip to main content -->
+    <a href="#textInput" class="skip-link">Skip to main content</a>
+    
+    <style>
+        /* Skip link for accessibility */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: #22c55e;
+            color: white;
+            padding: 8px;
+            text-decoration: none;
+            z-index: 100;
+        }
+        
+        .skip-link:focus {
+            top: 0;
+        }
+        
+        /* Visually hidden but accessible */
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        /* Subtitle styling */
+        .subtitle {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 10px;
+            animation: fadeIn 1s ease-out 0.3s both;
+        }
+        
+        /* Forms section */
+        .forms-section {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+        
 
+        
+        /* Button icons */
+        .button-icon {
+            margin-right: 8px;
+        }
+        
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+        
+        .footer p {
+            margin: 5px 0;
+        }
+        
+        .footer kbd {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+
+    </style>
 </body>
 
 </html>

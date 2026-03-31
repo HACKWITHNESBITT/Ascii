@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"utils/api" // Note: local package, uses module root
+	"ascii/utils/api" // Fixed: correct module path
 )
 
 func main() {
@@ -17,7 +17,6 @@ func main() {
 	http.HandleFunc("/", api.HomeHandler)
 	http.HandleFunc("/generate-qr", api.GenerateQRHandler)
 	http.HandleFunc("/generate-logo", api.GenerateLogoHandler)
-	http.HandleFunc("/download/png", api.DownloadPNG)
 	http.HandleFunc("/download/ascii", api.DownloadASCII)
 	http.HandleFunc("/api/qr", api.APIQR)
 

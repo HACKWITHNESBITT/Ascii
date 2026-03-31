@@ -3,9 +3,7 @@ package api
 import (
 	"html/template"
 	"net/http"
-	"utils"
-
-	"github.com/skip2/go-qrcode"
+	"ascii/utils" // Fixed: correct module path
 )
 
 var templates = template.Must(template.ParseFiles("utils/api/templates/index.html"))
@@ -52,24 +50,6 @@ func GenerateLogoHandler(w http.ResponseWriter, r *http.Request) {
 		Logo    string
 		Text    string
 	}{ASCIIQR: "", Logo: logo, Text: text})
-}
-
-func DownloadPNG(w http.ResponseWriter, r *http.Request) {
-	text := r.URL.Query().Get("text")
-	if text == "" {
-		http.Error(w, "Text required", http.StatusBadRequest)
-		return
-	}
-
-	qr, err := qrcode.New(text, qrcode.Medium)
-	if err != nil {
-		http.Error(w, "QR generation failed", http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "image/png")
-	w.Header().Set("Content-Disposition", "attachment; filename=qr.png")
-	qr.PNG(256)
 }
 
 func DownloadASCII(w http.ResponseWriter, r *http.Request) {
