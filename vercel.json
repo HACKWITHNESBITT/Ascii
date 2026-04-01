@@ -19,6 +19,5 @@
       "src": "/(.*)",
       "dest": "api/index.go"
     }
-  ],
-  "ignore": ["node_modules"]
+  ]
 }
