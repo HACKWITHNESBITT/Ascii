@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	"ascii/utils/api" // Fixed: correct module path
 )
@@ -21,9 +22,14 @@ func main() {
 	http.HandleFunc("/download/qr-image", api.DownloadQRImage)
 	http.HandleFunc("/api/qr", api.APIQR)
 
-	fmt.Println("Server running on http://localhost:8080")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	fmt.Printf("Server running on http://localhost:%s\n", port)
+
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		fmt.Println("Server error:", err)
 	}
 }
