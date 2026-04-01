@@ -26,3 +26,16 @@ func GenerateASCII(text string) string {
 
 	return ascii
 }
+
+func GeneratePNG(text string) ([]byte, error) {
+	qr, err := qrcode.New(text, qrcode.Medium)
+	if err != nil {
+		return nil, err
+	}
+	
+	pngData, err := qr.PNG(256)
+	if err != nil {
+		return nil, err
+	}
+	return pngData, nil
+}

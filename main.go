@@ -18,6 +18,7 @@ func main() {
 	http.HandleFunc("/generate-qr", api.GenerateQRHandler)
 	http.HandleFunc("/generate-logo", api.GenerateLogoHandler)
 	http.HandleFunc("/download/ascii", api.DownloadASCII)
+	http.HandleFunc("/download/qr-image", api.DownloadQRImage)
 	http.HandleFunc("/api/qr", api.APIQR)
 
 	fmt.Println("Server running on http://localhost:8080")

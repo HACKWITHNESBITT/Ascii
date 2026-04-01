@@ -11,7 +11,7 @@
     <title>QR TEXTIFY - ASCII Art Generator</title>
     
     <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎨</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>QR</text></svg>">
     
     <!-- Stylesheet -->
     <link rel="stylesheet" href="/static/style.css">
@@ -60,7 +60,7 @@
             <form id="qrForm" action="/generate-qr" method="POST" aria-label="Generate QR code form">
                 <input type="hidden" name="text" id="qrText">
                 <button type="submit" data-tooltip="Generate QR code from text (Ctrl+Enter)">
-                    <span class="button-icon">📱</span>
+                    <span class="button-icon">QR</span>
                     Generate QR
                 </button>
             </form>
@@ -68,7 +68,6 @@
             <form id="logoForm" action="/generate-logo" method="POST" aria-label="Generate logo form">
                 <input type="hidden" name="text" id="logoText">
                 <button type="submit" data-tooltip="Generate ASCII art logo (Ctrl+Shift+Enter)">
-                    <span class="button-icon">🎨</span>
                     Generate Logo
                 </button>
             </form>
@@ -77,18 +76,15 @@
         <!-- Actions Section -->
         <section class="actions" aria-label="Actions">
             <button onclick="copyASCII()" data-tooltip="Download QR code as text file">
-                <span class="button-icon">💾</span>
                 Download QR
             </button>
 
             <button onclick="copyLogo()" data-tooltip="Download logo as text file">
-                <span class="button-icon">📄</span>
                 Download Logo
             </button>
 
-            <a id="downloadASCII" href="/download/ascii?text={{.Text}}" data-tooltip="Download QR as text file">
-                <span class="button-icon">💾</span>
-                Download ASCII
+            <a id="downloadASCII" href="/download/qr-image?text={{.Text}}" data-tooltip="Download QR as PNG image">
+                Download QR Image
             </a>
         </section>
 

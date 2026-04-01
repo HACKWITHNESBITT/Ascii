@@ -76,3 +76,21 @@ func APIQR(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(`{"ascii":"` + template.HTMLEscapeString(ascii) + `"}`))
 }
+
+func DownloadQRImage(w http.ResponseWriter, r *http.Request) {
+	text := r.URL.Query().Get("text")
+	if text == "" {
+		http.Error(w, "Text required", http.StatusBadRequest)
+		return
+	}
+
+	pngData, err := utils.GeneratePNG(text)
+	if err != nil {
+		http.Error(w, "Error generating QR image", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "image/png")
+	w.Header().Set("Content-Disposition", "attachment; filename=qr-code.png")
+	w.Write(pngData)
+}

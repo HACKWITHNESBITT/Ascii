@@ -62,7 +62,7 @@ forms.forEach(form => {
         loader.classList.add('fade-in')
         
         // Update download link
-        document.getElementById("downloadASCII").href = "/download/ascii?text=" + encodeURIComponent(text)
+        document.getElementById("downloadASCII").href = "/download/qr-image?text=" + encodeURIComponent(text)
         
         // Add loading state to button
         const button = form.querySelector('button')
@@ -80,16 +80,20 @@ function copyASCII() {
         return
     }
     
-    // Create download link
-    const blob = new Blob([ascii], { type: 'text/plain' })
-    const url = URL.createObjectURL(blob)
+    // Get the text from input
+    const text = input.value.trim()
+    if (!text) {
+        showNotification('Please enter text first', 'error')
+        return
+    }
+    
+    // Download PNG image instead of ASCII text
     const a = document.createElement('a')
-    a.href = url
-    a.download = 'qr-code.txt'
+    a.href = '/download/qr-image?text=' + encodeURIComponent(text)
+    a.download = 'qr-code.png'
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
-    URL.revokeObjectURL(url)
     
     showNotification('QR code downloaded!', 'success')
     
