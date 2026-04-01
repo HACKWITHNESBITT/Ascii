@@ -3,11 +3,25 @@ package handler
 import (
 	"html/template"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"ascii/utils"
 )
 
-var templates = template.Must(template.ParseFiles("utils/api/templates/index.html"))
+var templates *template.Template
+
+func init() {
+	// Get the current working directory
+	wd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	
+	// Construct the template path
+	templatePath := filepath.Join(wd, "utils", "api", "templates", "index.html")
+	templates = template.Must(template.ParseFiles(templatePath))
+}
 
 func Handler(w http.ResponseWriter, r *http.Request) {
 	switch r.URL.Path {
