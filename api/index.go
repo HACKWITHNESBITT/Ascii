@@ -20,6 +20,13 @@ func init() {
 	
 	// Construct the template path
 	templatePath := filepath.Join(wd, "utils", "api", "templates", "index.html")
+	
+	// Check if file exists
+	if _, err := os.Stat(templatePath); os.IsNotExist(err) {
+		// Try alternative path for Vercel
+		templatePath = filepath.Join(wd, "..", "utils", "api", "templates", "index.html")
+	}
+	
 	templates = template.Must(template.ParseFiles(templatePath))
 }
 
