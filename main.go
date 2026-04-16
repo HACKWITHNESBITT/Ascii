@@ -1,41 +1,33 @@
 package main
 
 import (
-	"embed"
-	"fmt"
 	"net/http"
-	"os"
 
 	"ascii/utils/api"
 )
 
-// Embed static files
-//go:embed utils/api/templates/static/*
-var staticFiles embed.FS
+// Vercel entrypoint handler
+func Handler(w http.ResponseWriter, r *http.Request) {
+	switch r.URL.Path {
+	case "/":
+		api.HomeHandler(w, r)
 
-func main() {
-	// Serve embedded static files
-	fs := http.FS(staticFiles)
-	http.Handle("/static/",
-		http.StripPrefix("/static/",
-			http.FileServer(fs)))
+	case "/generate-qr":
+		api.GenerateQRHandler(w, r)
 
-	// Routes
-	http.HandleFunc("/", api.HomeHandler)
-	http.HandleFunc("/generate-qr", api.GenerateQRHandler)
-	http.HandleFunc("/generate-logo", api.GenerateLogoHandler)
-	http.HandleFunc("/download/ascii", api.DownloadASCII)
-	http.HandleFunc("/download/qr-image", api.DownloadQRImage)
-	http.HandleFunc("/api/qr", api.APIQR)
+	case "/generate-logo":
+		api.GenerateLogoHandler(w, r)
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
+	case "/download/ascii":
+		api.DownloadASCII(w, r)
 
-	fmt.Printf("Server running on port %s\n", port)
+	case "/download/qr-image":
+		api.DownloadQRImage(w, r)
 
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
-		fmt.Println("Server error:", err)
+	case "/api/qr":
+		api.APIQR(w, r)
+
+	default:
+		http.NotFound(w, r)
 	}
 }
