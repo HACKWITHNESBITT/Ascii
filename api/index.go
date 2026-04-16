@@ -2,9 +2,8 @@ package handler
 
 import (
 	"html/template"
+	"log"
 	"net/http"
-	"os"
-	"path/filepath"
 
 	"ascii/utils"
 )
@@ -12,28 +11,11 @@ import (
 var templates *template.Template
 
 func init() {
-	// Get the current working directory
-	wd, err := os.Getwd()
+	var err error
+	templates, err = template.ParseFiles("templates/index.html")
 	if err != nil {
-		panic(err)
+		log.Fatalf("failed to load template: %v", err)
 	}
-	
-	// Construct the template path
-	templatePath := filepath.Join(wd, "utils", "api", "templates", "index.html")
-	
-	// Check if file exists
-	if _, err := os.Stat(templatePath); os.IsNotExist(err) {
-		// Try alternative path for Vercel
-		templatePath = filepath.Join(wd, "..", "utils", "api", "templates", "index.html")
-		
-		// Check if alternative path exists
-		if _, err := os.Stat(templatePath); os.IsNotExist(err) {
-			// Try another alternative path for Vercel
-			templatePath = filepath.Join(wd, "..", "..", "utils", "api", "templates", "index.html")
-		}
-	}
-	
-	templates = template.Must(template.ParseFiles(templatePath))
 }
 
 func Handler(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +38,11 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	templates.ExecuteTemplate(w, "index.html", nil)
+	err := templates.ExecuteTemplate(w, "index.html", nil)
+	if err != nil {
+		log.Println("template error:", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
 }
 
 func GenerateQRHandler(w http.ResponseWriter, r *http.Request) {
@@ -72,11 +58,21 @@ func GenerateQRHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	asciiQR := utils.GenerateASCII(text)
-	templates.ExecuteTemplate(w, "index.html", struct {
+
+	err := templates.ExecuteTemplate(w, "index.html", struct {
 		ASCIIQR string
 		Logo    string
 		Text    string
-	}{ASCIIQR: asciiQR, Logo: "", Text: text})
+	}{
+		ASCIIQR: asciiQR,
+		Logo:    "",
+		Text:    text,
+	})
+
+	if err != nil {
+		log.Println("template error:", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
 }
 
 func GenerateLogoHandler(w http.ResponseWriter, r *http.Request) {
@@ -92,11 +88,21 @@ func GenerateLogoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logo := utils.GenerateLogo(text)
-	templates.ExecuteTemplate(w, "index.html", struct {
+
+	err := templates.ExecuteTemplate(w, "index.html", struct {
 		ASCIIQR string
 		Logo    string
 		Text    string
-	}{ASCIIQR: "", Logo: logo, Text: text})
+	}{
+		ASCIIQR: "",
+		Logo:    logo,
+		Text:    text,
+	})
+
+	if err != nil {
+		log.Println("template error:", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
 }
 
 func DownloadASCII(w http.ResponseWriter, r *http.Request) {
@@ -107,6 +113,7 @@ func DownloadASCII(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ascii := utils.GenerateASCII(text)
+
 	w.Header().Set("Content-Type", "text/plain")
 	w.Header().Set("Content-Disposition", "attachment; filename=qr-ascii.txt")
 	w.Write([]byte(ascii))
@@ -138,6 +145,7 @@ func APIQR(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ascii := utils.GenerateASCII(text)
+
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(`{"ascii":"` + template.HTMLEscapeString(ascii) + `"}`))
 }
