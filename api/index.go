@@ -4,6 +4,8 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"ascii/utils"
 )
@@ -11,10 +13,30 @@ import (
 var templates *template.Template
 
 func init() {
+	// Try multiple safe locations (works locally + Vercel)
+	possiblePaths := []string{
+		"templates/index.html",
+		filepath.Join("templates", "index.html"),
+		filepath.Join("utils", "api", "templates", "index.html"),
+	}
+
 	var err error
-	templates, err = template.ParseFiles("templates/index.html")
+	var tplPath string
+
+	for _, p := range possiblePaths {
+		if _, statErr := os.Stat(p); statErr == nil {
+			tplPath = p
+			break
+		}
+	}
+
+	if tplPath == "" {
+		log.Fatal("template file not found in any known location")
+	}
+
+	templates, err = template.ParseFiles(tplPath)
 	if err != nil {
-		log.Fatalf("failed to load template: %v", err)
+		log.Fatalf("failed to parse template: %v", err)
 	}
 }
 
@@ -38,8 +60,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	err := templates.ExecuteTemplate(w, "index.html", nil)
-	if err != nil {
+	if err := templates.ExecuteTemplate(w, "index.html", nil); err != nil {
 		log.Println("template error:", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
@@ -59,7 +80,7 @@ func GenerateQRHandler(w http.ResponseWriter, r *http.Request) {
 
 	asciiQR := utils.GenerateASCII(text)
 
-	err := templates.ExecuteTemplate(w, "index.html", struct {
+	if err := templates.ExecuteTemplate(w, "index.html", struct {
 		ASCIIQR string
 		Logo    string
 		Text    string
@@ -67,9 +88,7 @@ func GenerateQRHandler(w http.ResponseWriter, r *http.Request) {
 		ASCIIQR: asciiQR,
 		Logo:    "",
 		Text:    text,
-	})
-
-	if err != nil {
+	}); err != nil {
 		log.Println("template error:", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
@@ -89,7 +108,7 @@ func GenerateLogoHandler(w http.ResponseWriter, r *http.Request) {
 
 	logo := utils.GenerateLogo(text)
 
-	err := templates.ExecuteTemplate(w, "index.html", struct {
+	if err := templates.ExecuteTemplate(w, "index.html", struct {
 		ASCIIQR string
 		Logo    string
 		Text    string
@@ -97,9 +116,7 @@ func GenerateLogoHandler(w http.ResponseWriter, r *http.Request) {
 		ASCIIQR: "",
 		Logo:    logo,
 		Text:    text,
-	})
-
-	if err != nil {
+	}); err != nil {
 		log.Println("template error:", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
@@ -128,6 +145,7 @@ func DownloadQRImage(w http.ResponseWriter, r *http.Request) {
 
 	pngData, err := utils.GeneratePNG(text)
 	if err != nil {
+		log.Println("PNG error:", err)
 		http.Error(w, "Error generating QR image", http.StatusInternalServerError)
 		return
 	}
